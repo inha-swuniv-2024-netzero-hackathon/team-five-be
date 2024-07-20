@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model account {
+  idx        Int     @id @default(autoincrement())
+  id         String  @db.VarChar
+  qr         String  @db.VarChar
+  latitude   String? @db.VarChar
+  longtitude String? @db.VarChar
+  coo        Int?
+  reply      reply[]
+}
+
+model product {
+  idx            Int    @id @default(autoincrement())
+  image          String? @db.VarChar
+  store_idx      Int    @default(autoincrement())
+  name           String @db.VarChar
+  price          Int
+  discount_price Int
+  store          store  @relation(fields: [store_idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_store_to_product")
+}
+
+model reply {
+  idx         Int     @id @default(autoincrement())
+  account_idx Int     @default(autoincrement())
+  store_idx   Int     @default(autoincrement())
+  text        String? @db.VarChar
+  score       Int?
+  account     account @relation(fields: [account_idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_to_reply")
+  store       store   @relation(fields: [store_idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_store_to_reply")
+}
+
+model store {
+  idx        Int         @id @default(autoincrement())
+  image      String?     @db.VarChar
+  name       String      @db.VarChar
+  latitude   String      @db.VarChar
+  longtitude String      @db.VarChar
+  address    String      @db.VarChar
+  score      Decimal     @db.Decimal(10, 8)
+  product    product[]
+  reply      reply[]
+  zero_list  zero_list[]
+}
+
+model zero_list {
+  idx       Int   @id @default(autoincrement())
+  store_idx Int   @default(autoincrement())
+  num       Int
+  store     store @relation(fields: [store_idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_store_to_zero_list")
+}
